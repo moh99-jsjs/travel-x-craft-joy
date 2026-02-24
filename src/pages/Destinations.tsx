@@ -14,9 +14,15 @@ const destinations = [
   { id: 1, name: "Santorini, Greece", image: santoriniImg, rating: 4.9, reviews: 2847, price: "From $899", category: "Beach", region: "Europe" },
   { id: 2, name: "Maldives", image: maldivesImg, rating: 4.8, reviews: 3156, price: "From $1,299", category: "Luxury", region: "Asia" },
   { id: 3, name: "Bali, Indonesia", image: baliImg, rating: 4.7, reviews: 4521, price: "From $699", category: "Adventure", region: "Asia" },
-  { id: 4, name: "Swiss Alps", image: switzerlandImg, rating: 4.9, reviews: 1893, price: "From $1,099", category: "Mountain", region: "Europe" },
-  { id: 5, name: "Santorini Evening", image: santoriniImg, rating: 4.8, reviews: 1245, price: "From $799", category: "Beach", region: "Europe" },
-  { id: 6, name: "Maldives Resort", image: maldivesImg, rating: 5.0, reviews: 892, price: "From $1,599", category: "Luxury", region: "Asia" },
+  { id: 4, name: "Swiss Alps, Switzerland", image: switzerlandImg, rating: 4.9, reviews: 1893, price: "From $1,099", category: "Mountain", region: "Europe" },
+  { id: 5, name: "Paris, France", image: santoriniImg, rating: 4.8, reviews: 5230, price: "From $749", category: "Culture", region: "Europe" },
+  { id: 6, name: "Dubai, UAE", image: maldivesImg, rating: 4.9, reviews: 4102, price: "From $599", category: "Luxury", region: "Asia" },
+  { id: 7, name: "Machu Picchu, Peru", image: switzerlandImg, rating: 4.9, reviews: 3890, price: "From $999", category: "Adventure", region: "Americas" },
+  { id: 8, name: "Tokyo, Japan", image: baliImg, rating: 4.8, reviews: 6120, price: "From $849", category: "Culture", region: "Asia" },
+  { id: 9, name: "Cape Town, South Africa", image: santoriniImg, rating: 4.7, reviews: 2450, price: "From $679", category: "Adventure", region: "Africa" },
+  { id: 10, name: "Sydney, Australia", image: maldivesImg, rating: 4.8, reviews: 3780, price: "From $1,199", category: "Beach", region: "Oceania" },
+  { id: 11, name: "Istanbul, Turkey", image: switzerlandImg, rating: 4.7, reviews: 4890, price: "From $499", category: "Culture", region: "Europe" },
+  { id: 12, name: "Cancún, Mexico", image: baliImg, rating: 4.6, reviews: 5340, price: "From $549", category: "Beach", region: "Americas" },
 ];
 
 const categories = ["All", "Beach", "Mountain", "Adventure", "Luxury", "Culture"];

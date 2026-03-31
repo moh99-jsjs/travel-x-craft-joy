@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Plane } from "lucide-react";
+import { Menu, X, Plane, LogIn, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -18,6 +19,7 @@ export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const isHome = location.pathname === "/";
+  const { user, signOut } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -79,14 +81,46 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* CTA Button */}
-          <div className="hidden lg:block">
-            <Button
-              variant={isScrolled || !isHome ? "hero" : "heroOutline"}
-              size="lg"
-            >
-              Book Now
-            </Button>
+          {/* Auth Buttons */}
+          <div className="hidden lg:flex items-center gap-3">
+            {user ? (
+              <>
+                <span className={cn(
+                  "text-sm font-medium flex items-center gap-1",
+                  isScrolled || !isHome ? "text-foreground" : "text-primary-foreground"
+                )}>
+                  <User className="h-4 w-4" />
+                  {user.user_metadata?.full_name || user.email?.split("@")[0]}
+                </span>
+                <Button
+                  variant={isScrolled || !isHome ? "outline" : "heroOutline"}
+                  size="sm"
+                  onClick={signOut}
+                  className="gap-1"
+                >
+                  <LogOut className="h-4 w-4" />
+                  خروج
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button
+                    variant={isScrolled || !isHome ? "outline" : "heroOutline"}
+                    size="sm"
+                    className="gap-1"
+                  >
+                    <LogIn className="h-4 w-4" />
+                    دخول
+                  </Button>
+                </Link>
+                <Link to="/signup">
+                  <Button variant="hero" size="sm">
+                    إنشاء حساب
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -106,7 +140,7 @@ export function Navbar() {
         {/* Mobile Menu */}
         <div className={cn(
           "lg:hidden overflow-hidden transition-all duration-300",
-          isMobileMenuOpen ? "max-h-96 pb-6" : "max-h-0"
+          isMobileMenuOpen ? "max-h-[500px] pb-6" : "max-h-0"
         )}>
           <div className="flex flex-col gap-4 pt-4">
             {navLinks.map((link) => (
@@ -124,9 +158,26 @@ export function Navbar() {
                 {link.name}
               </Link>
             ))}
-            <Button variant="hero" size="lg" className="mt-4">
-              Book Now
-            </Button>
+            {user ? (
+              <Button variant="hero" size="lg" className="mt-4 gap-2" onClick={() => { signOut(); setIsMobileMenuOpen(false); }}>
+                <LogOut className="h-4 w-4" />
+                تسجيل الخروج
+              </Button>
+            ) : (
+              <div className="flex flex-col gap-2 mt-4">
+                <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button variant="outline" size="lg" className="w-full gap-2">
+                    <LogIn className="h-4 w-4" />
+                    تسجيل الدخول
+                  </Button>
+                </Link>
+                <Link to="/signup" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button variant="hero" size="lg" className="w-full">
+                    إنشاء حساب
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </nav>

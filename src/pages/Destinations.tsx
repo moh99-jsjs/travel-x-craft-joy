@@ -1,49 +1,45 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { MapPin, Star, Filter, Search } from "lucide-react";
+import { MapPin, Star, Search, Loader2 } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
-
-import santoriniImg from "@/assets/destination-santorini.jpg";
-import maldivesImg from "@/assets/destination-maldives.jpg";
-import baliImg from "@/assets/destination-bali.jpg";
-import switzerlandImg from "@/assets/destination-switzerland.jpg";
-
-const destinations = [
-  { id: 1, name: "Santorini, Greece", image: santoriniImg, rating: 4.9, reviews: 2847, price: "From $899", category: "Beach", region: "Europe" },
-  { id: 2, name: "Maldives", image: maldivesImg, rating: 4.8, reviews: 3156, price: "From $1,299", category: "Luxury", region: "Asia" },
-  { id: 3, name: "Bali, Indonesia", image: baliImg, rating: 4.7, reviews: 4521, price: "From $699", category: "Adventure", region: "Asia" },
-  { id: 4, name: "Swiss Alps, Switzerland", image: switzerlandImg, rating: 4.9, reviews: 1893, price: "From $1,099", category: "Mountain", region: "Europe" },
-  { id: 5, name: "Paris, France", image: santoriniImg, rating: 4.8, reviews: 5230, price: "From $749", category: "Culture", region: "Europe" },
-  { id: 6, name: "Dubai, UAE", image: maldivesImg, rating: 4.9, reviews: 4102, price: "From $599", category: "Luxury", region: "Asia" },
-  { id: 7, name: "Machu Picchu, Peru", image: switzerlandImg, rating: 4.9, reviews: 3890, price: "From $999", category: "Adventure", region: "Americas" },
-  { id: 8, name: "Tokyo, Japan", image: baliImg, rating: 4.8, reviews: 6120, price: "From $849", category: "Culture", region: "Asia" },
-  { id: 9, name: "Cape Town, South Africa", image: santoriniImg, rating: 4.7, reviews: 2450, price: "From $679", category: "Adventure", region: "Africa" },
-  { id: 10, name: "Sydney, Australia", image: maldivesImg, rating: 4.8, reviews: 3780, price: "From $1,199", category: "Beach", region: "Oceania" },
-  { id: 11, name: "Istanbul, Turkey", image: switzerlandImg, rating: 4.7, reviews: 4890, price: "From $499", category: "Culture", region: "Europe" },
-  { id: 12, name: "Cancún, Mexico", image: baliImg, rating: 4.6, reviews: 5340, price: "From $549", category: "Beach", region: "Americas" },
-];
+import { supabase } from "@/integrations/supabase/client";
+import type { Tables } from "@/integrations/supabase/types";
 
 const categories = ["All", "Beach", "Mountain", "Adventure", "Luxury", "Culture"];
-const regions = ["All Regions", "Europe", "Asia", "Americas", "Africa", "Oceania"];
 
 const Destinations = () => {
+  const [destinations, setDestinations] = useState<Tables<"destinations">[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [selectedRegion, setSelectedRegion] = useState("All Regions");
   const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    const fetchDestinations = async () => {
+      const { data, error } = await supabase
+        .from("destinations")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (data) setDestinations(data);
+      setLoading(false);
+    };
+    fetchDestinations();
+  }, []);
 
   const filteredDestinations = destinations.filter((dest) => {
     const matchesCategory = selectedCategory === "All" || dest.category === selectedCategory;
-    const matchesRegion = selectedRegion === "All Regions" || dest.region === selectedRegion;
-    const matchesSearch = dest.name.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesRegion && matchesSearch;
+    const matchesSearch =
+      dest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      dest.country.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
   });
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       {/* Hero */}
       <section className="pt-32 pb-16 bg-ocean-dark text-primary-foreground">
         <div className="container-custom">
@@ -60,7 +56,6 @@ const Destinations = () => {
       <section className="py-8 bg-card border-b border-border sticky top-20 z-40">
         <div className="container-custom">
           <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
-            {/* Search */}
             <div className="relative w-full lg:w-80">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <input
@@ -72,7 +67,6 @@ const Destinations = () => {
               />
             </div>
 
-            {/* Categories */}
             <div className="flex gap-2 flex-wrap justify-center">
               {categories.map((cat) => (
                 <button
@@ -88,17 +82,6 @@ const Destinations = () => {
                 </button>
               ))}
             </div>
-
-            {/* Region Filter */}
-            <select
-              value={selectedRegion}
-              onChange={(e) => setSelectedRegion(e.target.value)}
-              className="h-12 px-4 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-ocean"
-            >
-              {regions.map((region) => (
-                <option key={region} value={region}>{region}</option>
-              ))}
-            </select>
           </div>
         </div>
       </section>
@@ -106,48 +89,58 @@ const Destinations = () => {
       {/* Destinations Grid */}
       <section className="py-16">
         <div className="container-custom">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredDestinations.map((destination, index) => (
-              <Link
-                key={`${destination.id}-${index}`}
-                to={`/destinations/${destination.id}`}
-                className="group relative rounded-2xl overflow-hidden aspect-[4/3] shadow-card hover:shadow-glow transition-all duration-500"
-              >
-                <img
-                  src={destination.image}
-                  alt={destination.name}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-card" />
-                
-                <div className="absolute top-4 left-4">
-                  <span className="bg-primary-foreground/20 backdrop-blur-sm text-primary-foreground text-xs font-medium px-3 py-1.5 rounded-full">
-                    {destination.category}
-                  </span>
-                </div>
+          {loading ? (
+            <div className="flex justify-center py-16">
+              <Loader2 className="h-8 w-8 animate-spin text-ocean" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredDestinations.map((destination) => (
+                <Link
+                  key={destination.id}
+                  to={`/destinations/${destination.id}`}
+                  className="group relative rounded-2xl overflow-hidden aspect-[4/3] shadow-card hover:shadow-glow transition-all duration-500"
+                >
+                  <img
+                    src={destination.image_url || "/placeholder.svg"}
+                    alt={destination.name}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-card" />
 
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <div className="flex items-center gap-1 text-primary-foreground/80 mb-2">
-                    <MapPin className="h-4 w-4" />
-                    <span className="text-sm">{destination.name}</span>
+                  <div className="absolute top-4 left-4">
+                    <span className="bg-primary-foreground/20 backdrop-blur-sm text-primary-foreground text-xs font-medium px-3 py-1.5 rounded-full">
+                      {destination.category}
+                    </span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Star className="h-4 w-4 fill-sunset text-sunset" />
-                      <span className="text-primary-foreground font-medium">{destination.rating}</span>
-                      <span className="text-primary-foreground/60 text-sm">({destination.reviews})</span>
+
+                  <div className="absolute bottom-0 left-0 right-0 p-6">
+                    <div className="flex items-center gap-1 text-primary-foreground/80 mb-2">
+                      <MapPin className="h-4 w-4" />
+                      <span className="text-sm">{destination.name}، {destination.country}</span>
                     </div>
-                    <span className="text-primary-foreground font-semibold">{destination.price}</span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Star className="h-4 w-4 fill-sunset text-sunset" />
+                        <span className="text-primary-foreground font-medium">{destination.rating}</span>
+                        <span className="text-primary-foreground/60 text-sm">({destination.reviews_count})</span>
+                      </div>
+                      {destination.price_from && (
+                        <span className="text-primary-foreground font-semibold">
+                          From ${destination.price_from}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+                </Link>
+              ))}
+            </div>
+          )}
 
-          {filteredDestinations.length === 0 && (
+          {!loading && filteredDestinations.length === 0 && (
             <div className="text-center py-16">
               <p className="text-muted-foreground text-lg">No destinations found matching your criteria.</p>
-              <Button variant="outline" className="mt-4" onClick={() => { setSelectedCategory("All"); setSelectedRegion("All Regions"); setSearchQuery(""); }}>
+              <Button variant="outline" className="mt-4" onClick={() => { setSelectedCategory("All"); setSearchQuery(""); }}>
                 Clear Filters
               </Button>
             </div>

@@ -9,6 +9,7 @@ import Destinations from "./pages/Destinations";
 import DestinationDetails from "./pages/DestinationDetails";
 import Tours from "./pages/Tours";
 import Hotels from "./pages/Hotels";
+import ExploreTrips from "./pages/ExploreTrips";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/destinations/:id" element={<DestinationDetails />} />
             <Route path="/tours" element={<Tours />} />
             <Route path="/hotels" element={<Hotels />} />
+            <Route path="/explore" element={<ExploreTrips />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />

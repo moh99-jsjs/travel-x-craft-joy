@@ -10,6 +10,7 @@ const navLinks = [
   { name: "Destinations", href: "/destinations" },
   { name: "Tours", href: "/tours" },
   { name: "Hotels", href: "/hotels" },
+  { name: "استكشاف الرحلات", href: "/explore" },
   { name: "About", href: "/about" },
   { name: "Contact", href: "/contact" },
 ];

@@ -1,4 +1,5 @@
-import { describe, expect, test } from "bun:test";
+import { describe, it as test } from "node:test";
+import { deepStrictEqual, strictEqual } from "node:assert";
 import { filterHotels } from "./hotel-filters";
 
 const hotels = [
@@ -11,20 +12,20 @@ const hotels = [
 
 describe("hotel search and filters", () => {
   test("searches Arabic names and locations and ignores case and outer spaces", () => {
-    expect(filterHotels(hotels, " دبي ", "all", 0)).toEqual([hotels[0]]);
-    expect(filterHotels(hotels, " PARIS ", "all", 0)).toEqual([hotels[1]]);
+    deepStrictEqual(filterHotels(hotels, " دبي ", "all", 0), [hotels[0]]);
+    deepStrictEqual(filterHotels(hotels, " PARIS ", "all", 0), [hotels[1]]);
   });
   test("all prices includes hotels above the old price cap", () => {
-    expect(filterHotels(hotels, "", "all", 0)).toHaveLength(5);
+    strictEqual(filterHotels(hotels, "", "all", 0).length, 5);
   });
   test("price brackets have exact non-overlapping boundaries", () => {
-    expect(filterHotels(hotels, "", "budget", 0)).toEqual([hotels[1]]);
-    expect(filterHotels(hotels, "", "mid", 0)).toEqual([hotels[2], hotels[3]]);
-    expect(filterHotels(hotels, "", "luxury", 0)).toEqual([hotels[0], hotels[4]]);
+    deepStrictEqual(filterHotels(hotels, "", "budget", 0), [hotels[1]]);
+    deepStrictEqual(filterHotels(hotels, "", "mid", 0), [hotels[2], hotels[3]]);
+    deepStrictEqual(filterHotels(hotels, "", "luxury", 0), [hotels[0], hotels[4]]);
   });
   test("combines search, price, and inclusive minimum rating", () => {
-    expect(filterHotels(hotels, "Hotel", "mid", 4.8)).toEqual([hotels[3]]);
-    expect(filterHotels(hotels, "Tokyo", "budget", 0)).toEqual([]);
-    expect(filterHotels(hotels, "", "all", 4.8)).toEqual([hotels[0], hotels[3]]);
+    deepStrictEqual(filterHotels(hotels, "Hotel", "mid", 4.8), [hotels[3]]);
+    deepStrictEqual(filterHotels(hotels, "Tokyo", "budget", 0), []);
+    deepStrictEqual(filterHotels(hotels, "", "all", 4.8), [hotels[0], hotels[3]]);
   });
 });
